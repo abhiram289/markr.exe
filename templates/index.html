@@ -7,139 +7,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
 
-<style>
-
-:root{
-    --primary-color:#ffffff;
-    --secondary-color:#cccccc;
-    --accent-color:#00ff88;
-    --paper-color:#0a0a0a;
-    --grid-color:rgba(255,255,255,0.08);
-
-    --border-color:rgba(255,255,255,0.22);
-
-    --card-bg:rgba(255,255,255,0.03);
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:"Space Mono", monospace;
-    background:var(--paper-color);
-    color:var(--primary-color);
-    padding:3rem;
-}
-
-
-.paper{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
-    background:
-        linear-gradient(90deg,var(--grid-color) 1px,transparent 1px),
-        linear-gradient(var(--grid-color) 1px,transparent 1px);
-    background-size:30px 30px;
-}
-
-
-h1{
-    font-weight:400;
-    font-size:2.5rem;
-    margin-bottom:2.5rem;
-    background:linear-gradient(135deg,#fff,#00ff88);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-
-.wrapper{
-    display:grid;
-    grid-template-columns:420px 1fr;
-    gap:60px;
-}
-
-
-.controls{
-    background:var(--card-bg);
-    border:1px solid var(--border-color);
-    border-radius:8px;
-    padding:2rem;
-}
-
-
-input[type="text"], select{
-    width:100%;
-    background:#0a0a0a;
-    border:1px solid var(--border-color);
-    color:white;
-    padding:10px;
-    margin-top:10px;
-}
-
-
-input[type="range"]{
-    width:100%;
-    margin-top:10px;
-}
-
-
-input[type="file"]{
-    margin-bottom:20px;
-}
-
-
-label{
-    display:block;
-    margin-top:1.5rem;
-    color:var(--secondary-color);
-}
-
-
-button{
-    margin-top:20px;
-    padding:10px 16px;
-    background:transparent;
-    border:1px solid var(--border-color);
-    color:white;
-    cursor:pointer;
-    transition:all .25s ease;
-}
-
-button:hover{
-    border-color:var(--accent-color);
-    color:var(--accent-color);
-    background:rgba(0,255,136,0.05);
-    box-shadow:0 0 8px rgba(0,255,136,0.25);
-}
-
-
-.preview{
-    background:var(--card-bg);
-    border:1px solid var(--border-color);
-    border-radius:8px;
-    padding:2rem;
-}
-
-
-.preview img{
-    max-width:100%;
-    border:1px solid var(--border-color);
-    margin-top:1rem;
-}
-
-
-.download-btn{
-    margin-top:1rem;
-}
-
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
 
@@ -147,7 +15,8 @@ button:hover{
 
 <div class="paper"></div>
 
-<h1>Image Watermark Tool</h1>
+<h1 class="stamp">Markr.exe</h1>
+<p class="subtitle">A minimal image watermarking utility</p>
 
 <div class="wrapper">
 
@@ -155,13 +24,18 @@ button:hover{
 
 <form method="POST" enctype="multipart/form-data">
 
-<input type="file" name="image" required>
+<label class="file-upload">
+Choose file
+<input type="file" name="image" id="imageInput" required>
+</label>
 
-<input type="text" name="watermark" placeholder="Enter watermark text">
+<span id="fileName">No file chosen</span>
+
+<input type="text" name="watermark" id="watermarkText" placeholder="Enter watermark text">
 
 <label>Position</label>
 
-<select name="position">
+<select name="position" id="positionSelect">
 <option value="bottom-right">Bottom Right</option>
 <option value="bottom-left">Bottom Left</option>
 <option value="top-right">Top Right</option>
@@ -171,7 +45,7 @@ button:hover{
 
 <label>Opacity</label>
 
-<input type="range" name="opacity" min="40" max="200" value="100">
+<input type="range" name="opacity" id="opacitySlider" min="40" max="200" value="100" disabled>
 
 <button type="submit">Generate Watermark</button>
 
@@ -181,13 +55,17 @@ button:hover{
 
 <div class="preview">
 
+<h2>Preview</h2>
+
+<div class="image-preview">
+
+<img id="previewImage">
+
+<div id="watermarkOverlay"></div>
+
+</div>
+
 {% if filename %}
-
-<h2>Watermarked Image</h2>
-
-<img src="/outputs/{{ filename }}">
-
-<br><br>
 
 <a href="/outputs/{{ filename }}" download>
 <button class="download-btn">Download Image</button>
@@ -199,6 +77,105 @@ button:hover{
 
 </div>
 
-</body>
+<footer>
+made by <a href="https://github.com/abhiram289">abhiram289</a>
+</footer>
 
+<script>
+
+/* get elements */
+
+const imageInput = document.getElementById("imageInput");
+const previewImage = document.getElementById("previewImage");
+const opacitySlider = document.getElementById("opacitySlider");
+const fileName = document.getElementById("fileName");
+
+const textInput = document.getElementById("watermarkText");
+const overlay = document.getElementById("watermarkOverlay");
+const positionSelect = document.getElementById("positionSelect");
+
+/* preview uploaded image */
+
+imageInput.addEventListener("change", function(){
+
+const file = this.files[0];
+
+if(file){
+
+previewImage.src = URL.createObjectURL(file);
+
+fileName.textContent = file.name;
+
+opacitySlider.disabled = false;
+
+}
+
+});
+
+/* default watermark position */
+
+overlay.style.bottom = "40px";
+overlay.style.right = "40px";
+
+/* live watermark text */
+
+textInput.addEventListener("input", () => {
+
+overlay.textContent = textInput.value;
+
+});
+
+/* live opacity */
+
+opacitySlider.addEventListener("input", () => {
+
+overlay.style.opacity = opacitySlider.value / 200;
+
+});
+
+/* live position */
+
+positionSelect.addEventListener("change", () => {
+
+overlay.style.top = "";
+overlay.style.bottom = "";
+overlay.style.left = "";
+overlay.style.right = "";
+overlay.style.transform = "";
+
+switch(positionSelect.value){
+
+case "bottom-right":
+overlay.style.bottom = "40px";
+overlay.style.right = "40px";
+break;
+
+case "bottom-left":
+overlay.style.bottom = "40px";
+overlay.style.left = "40px";
+break;
+
+case "top-right":
+overlay.style.top = "40px";
+overlay.style.right = "40px";
+break;
+
+case "top-left":
+overlay.style.top = "40px";
+overlay.style.left = "40px";
+break;
+
+case "center":
+overlay.style.top = "50%";
+overlay.style.left = "50%";
+overlay.style.transform = "translate(-50%, -50%)";
+break;
+
+}
+
+});
+
+</script>
+
+</body>
 </html>
