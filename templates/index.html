@@ -71,8 +71,11 @@ style="max-width:100%; max-height:80vh; object-fit:contain;"
 </div>
 
 {% if filename %}
-<a href="/outputs/{{ filename }}" download onclick="setTimeout(() => location.reload(), 500)">
-<button class="download-btn">Download Image</button>
+<a class="download-btn"
+href="/outputs/{{ filename }}"
+download
+onclick="setTimeout(() => location.reload(), 500)">
+Download Image
 </a>
 {% else %}
 <button class="download-btn" disabled>Download Image</button>
@@ -88,7 +91,7 @@ made by <a href="https://github.com/abhiram289">abhiram289</a>
 
 <script>
 
-/* get elements */
+/* elements */
 
 const imageInput = document.getElementById("imageInput");
 const previewImage = document.getElementById("previewImage");
@@ -176,6 +179,16 @@ overlay.style.left = "50%";
 overlay.style.transform = "translate(-50%, -50%)";
 break;
 
+}
+
+});
+
+/* keep overlay text after server reload */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+if(previewImage.src.includes("/outputs/")){
+overlay.textContent = textInput.value;
 }
 
 });
