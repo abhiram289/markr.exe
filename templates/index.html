@@ -91,7 +91,6 @@ made by <a href="https://github.com/abhiram289">abhiram289</a>
 
 <script>
 
-/* elements */
 
 const imageInput = document.getElementById("imageInput");
 const previewImage = document.getElementById("previewImage");
@@ -102,7 +101,6 @@ const textInput = document.getElementById("watermarkText");
 const overlay = document.getElementById("watermarkOverlay");
 const positionSelect = document.getElementById("positionSelect");
 
-/* preview uploaded image */
 
 imageInput.addEventListener("change", function(){
 
@@ -120,12 +118,10 @@ opacitySlider.disabled = false;
 
 });
 
-/* default watermark position */
 
 overlay.style.bottom = "40px";
 overlay.style.right = "40px";
 
-/* live watermark text */
 
 textInput.addEventListener("input", () => {
 
@@ -133,7 +129,6 @@ overlay.textContent = textInput.value;
 
 });
 
-/* live opacity */
 
 opacitySlider.addEventListener("input", () => {
 
@@ -141,7 +136,6 @@ overlay.style.opacity = opacitySlider.value / 200;
 
 });
 
-/* live position */
 
 positionSelect.addEventListener("change", () => {
 
@@ -183,7 +177,6 @@ break;
 
 });
 
-/* keep overlay text after server reload */
 
 window.addEventListener("DOMContentLoaded", () => {
 
