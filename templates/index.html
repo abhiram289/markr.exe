@@ -59,19 +59,24 @@ Choose file
 
 <div class="image-preview">
 
-<img id="previewImage">
+<img id="previewImage"
+{% if filename %}
+src="/outputs/{{ filename }}"
+{% endif %}
+style="max-width:100%; max-height:80vh; object-fit:contain;"
+>
 
 <div id="watermarkOverlay"></div>
 
 </div>
 
 {% if filename %}
-
 <a href="/outputs/{{ filename }}" download>
 <button class="download-btn">Download Image</button>
 </a>
-
-{% endif %}
+{% else %}
+<button class="download-btn" disabled>Download Image</button>
+{% endif %}}
 
 </div>
 
