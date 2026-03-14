@@ -11,14 +11,14 @@ def add_text_watermark(input_path, output_path, text, position, opacity):
 
     font_size = min(45, max(18, width // 50))
 
-    font = ImageFont.truetype("DejaVuSans.ttf", font_size)
+    font = ImageFont.truetype("fonts/SpaceMono-Regular.ttf", font_size)
 
     bbox = draw.textbbox((0,0), text, font=font)
 
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
 
-    padding = 40
+    padding = int(min(width, height) * 0.04)
 
     if position == "bottom-right":
         x = width - text_width - padding
