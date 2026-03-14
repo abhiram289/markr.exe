@@ -22,26 +22,24 @@ def index():
     if request.method == "POST":
 
         file = request.files.get("image")
-        text = request.form.get("watermark", "")
+        text = request.form.get("watermark", "Watermark")
+        position = request.form.get("position", "bottom-right")
+        opacity = int(request.form.get("opacity", 150))
 
         if file and file.filename != "":
 
             input_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+
             output_filename = "watermarked_" + file.filename
             output_path = os.path.join(app.config["OUTPUT_FOLDER"], output_filename)
 
             file.save(input_path)
 
-            add_text_watermark(input_path, output_path, text)
+            add_text_watermark(input_path, output_path, text, position, opacity)
 
             filename = output_filename
 
     return render_template("index.html", filename=filename)
-
-
-@app.route("/uploads/<filename>")
-def uploaded_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 @app.route("/outputs/<filename>")
